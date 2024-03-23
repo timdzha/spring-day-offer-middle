@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 
@@ -42,6 +43,18 @@ class TaskDistributionApplicationTests {
 				.andExpect(jsonPath("$[*].fio",
 						contains("Armen", "Boris", "Mark", "Pavel", "Tamara")));
 	}
+
+//	@Test
+//	void shouldReturnBadRequestAllEmployeesIfNotValidSort() throws Exception {
+//		this.mockMvc.perform(get("/employees?sort=ISC"))
+//				.andDo(print())
+//				.andExpect(status().isBadRequest())
+//				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+//				.andExpect(jsonPath("$.*", isA(ProblemDetail.class)));
+//				//.andExpect(jsonPath("$.*", hasSize(1)))
+//				//.andExpect(jsonPath("$[*].fio",
+//				//		contains("Not valid")));
+//	}
 
 	@Test
 	void shouldReturnOneEmployee() throws Exception {
