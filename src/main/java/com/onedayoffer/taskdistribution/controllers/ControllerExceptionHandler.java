@@ -30,12 +30,9 @@ public class ControllerExceptionHandler {
     }
 
     @ExceptionHandler({EmployeeNotFoundException.class, TaskNotFoundException.class})
-    public ResponseEntity<ProblemDetail> handleSortDirectionNotValidBindException(RuntimeException exception) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-        problemDetail.setProperty("error", exception.getMessage());
-
-        return ResponseEntity.badRequest()
-                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
-                .body(problemDetail);
+    public ResponseEntity<?> handleSortDirectionNotValidBindException(RuntimeException exception) {
+        return ResponseEntity.notFound()
+                .header("error", exception.getMessage())
+                .build();
     }
 }

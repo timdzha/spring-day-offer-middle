@@ -33,7 +33,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         Optional<Sort.Direction> direction = Sort.Direction.fromOptionalString(sortDirection);
         if (direction.isEmpty()) {
-            throw new SortDirectionNotValidException("");
+            throw new SortDirectionNotValidException(sortDirection);
         }
         return modelMapper.map(
                 employeeRepository.findAllAndSort(

@@ -1,18 +1,32 @@
 package com.onedayoffer.taskdistribution;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import org.junit.jupiter.api.Test;
+import org.modelmapper.spi.ConditionalConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.test.web.servlet.MockMvc;
+
 import java.util.ArrayList;
+import java.util.regex.MatchResult;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -44,17 +58,14 @@ class TaskDistributionApplicationTests {
 						contains("Armen", "Boris", "Mark", "Pavel", "Tamara")));
 	}
 
-//	@Test
-//	void shouldReturnBadRequestAllEmployeesIfNotValidSort() throws Exception {
-//		this.mockMvc.perform(get("/employees?sort=ISC"))
-//				.andDo(print())
-//				.andExpect(status().isBadRequest())
-//				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-//				.andExpect(jsonPath("$.*", isA(ProblemDetail.class)));
-//				//.andExpect(jsonPath("$.*", hasSize(1)))
-//				//.andExpect(jsonPath("$[*].fio",
-//				//		contains("Not valid")));
-//	}
+	@Test
+	void shouldReturnBadRequestAllEmployeesIfNotValidSort() throws Exception {
+		this.mockMvc.perform(get("/employees?sort=ISC"))
+				.andDo(print())
+				.andExpect(status().isBadRequest())
+				.andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+				.andExpect(jsonPath("$.error", is("task sort not valid: ISC. task valid: [ASC, DESC]")));
+	}
 
 	@Test
 	void shouldReturnOneEmployee() throws Exception {
@@ -64,6 +75,14 @@ class TaskDistributionApplicationTests {
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.fio", is("Boris")))
 				.andExpect(jsonPath("$.jobTitle", is("hall employee")));
+	}
+
+	@Test
+	void shouldReturnNotFoundEmployee() throws Exception {
+		this.mockMvc.perform(get("/employees/10"))
+				.andDo(print())
+				.andExpect(status().isNotFound())
+				.andExpect(header().string("error", equalTo("employee not found by id: 10")));
 	}
 
 	@Test
